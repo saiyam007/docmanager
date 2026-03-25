@@ -1,9 +1,9 @@
 
-1.uv python install 3.12    ## uv python list   ##### 2.uv venv --python 3.12  
+1. uv python install 3.12    ## uv python list   ##### 2.uv venv --python 3.12  
 2. uv init
 3. uv sync
 
 
-Insatalltion library
+# Installation library
 
 1.uv pip install streamlit
