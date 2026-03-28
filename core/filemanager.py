@@ -10,7 +10,9 @@ PDF_STORAGE = os.path.join("storage", "pdfs")
 
 class FileManager:
 
-    def save_file(self, uploaded_file,PDF_STORAGE_DIR=None, THUMBNAIL_STORAGE_DIR=None):
+    def save_file(self, uploaded_file, PDF_STORAGE_DIR=None, THUMBNAIL_STORAGE_DIR=None):
+        if PDF_STORAGE_DIR is None:
+            PDF_STORAGE_DIR = PDF_STORAGE
         
         # 1. Save the file
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
