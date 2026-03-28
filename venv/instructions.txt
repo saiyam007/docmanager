@@ -7,3 +7,7 @@
 # Installation library
 
 1.uv pip install streamlit
+
+2.uv add  -r requirements.txt
+
+ add -> PyMuPDF=1.27.2.2 --> .toml than uv sync
