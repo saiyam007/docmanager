@@ -6,6 +6,7 @@ import re
 def sanitize_filename(filename):
     return re.sub(r'[<>:"/\\|?*]', '_', filename)
 
+PDF_STORAGE = os.path.join("storage", "pdfs")
 
 class FileManager:
 
@@ -30,4 +31,3 @@ class FileManager:
             f.write(file_bytes)
             
         return file_path
-    

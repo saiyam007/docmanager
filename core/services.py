@@ -1,3 +1,11 @@
+# upload document
+# --> uploaded_file, tags, document, date
+# --> uploaded_file --> test.pdf
+# --> uploaded_file --> test.pdf --> thumbnail
+# --> uploaded_file --> folder with the same name as pdf file --> test --> extract all images -> 0.jpg, 1.jpg
+# --> uploaded_file -> total pages
+# upload_date -> time, datetime
+
 
 from datetime import datetime
 import os
@@ -26,33 +34,36 @@ class DocumentService:
         self.pdf_reader = PDFReader()
 
     def upload_document(self, uploaded_file, tags, description, lecture_date=None):
+
+        # 1. Save file
+        file_path = self.file_manager.save_file(uploaded_file)
         
-        """"Handles the logic for uploading a document, 
-            including saving the file and
-            its metadata to the database."""
-        
-        
-        # 1. Save the file
-        file_path = self.file_manager.save_file(uploaded_file, PDF_STORAGE_DIR, THUMBNAIL_STORAGE_DIR)
-        # 2. Generate thumbnail for the document 
+        # 2. Generate thumbnail
         thumbnail_path = self.thumbnail_generator.generate_thumbnail(file_path)
-        print("Thumbnail Path:", thumbnail_path)
+        
         # 3. Get total pages
         total_pages = self.thumbnail_generator.get_total_pages(file_path)
-        print("Total Pages:", total_pages)
-
+        
         # 4. Convert to images
-        self.pdf_reader.convert_pdf_to_images(file_path)
-        # 5. Create required data : upload date, file size, file type, etc.
-        uploaded_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        file_size = os.path.getsize(file_path)
-        # 6. Save metadata to the database
+        self.reader.convert_pdf_to_images(file_path)
+        # 5. create required variables : upload date
+
+        upload_date = datetime.now().strftime("%Y-%m-%d")
         
-        doc = []
-        doc = Document(id=None, name=sanitize_filename(uploaded_file.name), path=file_path, thumbnail_path=thumbnail_path, tags=tags, description=description, uploaded_date=uploaded_date, lecture_date=None, total_pages=total_pages)    
-        doc.lecture_date = datetime.strptime(str(lecture_date), '%Y-%m-%d').date() if lecture_date else None            
-        
-        self.repo.add_document(doc)  # Save the document metadata to the database
+        doc = Document(
+            id=None,
+            name=uploaded_file.name,
+            path=file_path,
+            thumbnail_path=thumbnail_path,
+            tags=tags,
+            description=description,
+            upload_date=datetime.now().strftime("%Y-%m-%d"),
+            lecture_date=lecture_date,
+            total_pages=total_pages
+        )
+
+        # 6. Save to db
+        self.repo.add_document(doc)
         
 
     def search_documents(self, tags=None, description=None, lecture_date=None):
@@ -90,8 +101,6 @@ class DocumentService:
         # Logic to search for documents based on the query
         # This could involve querying a database or an indexing service
 
-
-    def get_document(self, document_id):
-        # Logic to retrieve a specific document by its ID
-        # This could involve fetching the file from storage and returning its contents or metadata
-        pass
+    
+    def search_documents(self, tag=None, date=None):
+        return self.repo.search_documents(tag, date)

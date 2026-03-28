@@ -1,21 +1,66 @@
-from datetime import datetime
-from db.database import get_db_connection
+from db.database import get_connection
 from core.models import Document
-
-today = datetime.today().strftime('%Y-%m-%d')
 
 class DocumentRepository:
     
-    def add_document(self,doc :Document):
-        conn  = get_db_connection()
+    def add_document(self, doc: Document):
+        conn = get_connection()
         cursor = conn.cursor()
-        doc.lecture_name = "Monal"
-        doc.last_accessed_date = today
-        cursor.execute('''
-            INSERT INTO documents (name, path, thumbnail_path, tags, description, uploaded_date, lecture_name, lecture_date, total_pages, last_accessed_date)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (doc.name, doc.path, doc.thumbnail_path, doc.tags, doc.description, doc.uploaded_date, doc.lecture_name, doc.lecture_date, doc.total_pages, doc.last_accessed_date))   
-        
+
+        cursor.execute("""
+        INSERT INTO documents (
+            name, path, thumbnail_path, tags, description,
+            upload_date, lecture_date, total_pages
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            doc.name,
+            doc.path,
+            doc.thumbnail_path,
+            doc.tags,
+            doc.description,
+            doc.upload_date,
+            doc.lecture_date,
+            doc.total_pages
+        ))
+
         conn.commit()
-        cursor.close()
         conn.close()
+
+    def search_documents(self, tag=None, date=None):
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        query = "SELECT * FROM documents"
+        conditions = []
+        params = []
+
+        # WHERE , OR
+
+        if tag:
+            conditions.append("tags LIKE ?")
+            params.append(f"%{tag}%")
+
+        if date:
+            conditions.append("lecture_date = ?")
+            params.append(date)
+        
+        if conditions:
+            # last_part_query = " OR ".join(conditions)
+            # query += " WHERE " 
+            # query+=last_part_query
+
+            query += " WHERE " + " OR ".join(conditions)
+        
+        cursor.execute(query, params)
+        rows = cursor.fetchall()
+        conn.close()
+
+        # list of document objects
+        return [Document(*row) for row in rows]
+    
+
+        
+
+
+
