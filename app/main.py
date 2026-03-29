@@ -49,6 +49,7 @@ with tabs[0]:
         # if uploaded_file and tags and description:
         if uploaded_file:
             service.upload_document(uploaded_file, tags, description, lecture_date)
+            st.success(f"File uploaded successfully! {uploaded_file.name}")
         else :
             st.error("Please upload a file")
 
